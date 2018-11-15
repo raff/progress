@@ -2,15 +2,22 @@ package progress
 
 import (
 	ui "github.com/gizak/termui"
+	"strings"
 )
 
 type Progress struct {
 	border bool
 	gs     []*ui.Gauge
 	ps     []*ui.Par
+
+	mtext    *ui.Par
+	messages []string
 }
 
-func New(n int, border bool) *Progress {
+//
+// New creates a new Progress object that manages "n" progress item and a message area with "m" lines
+//
+func New(n, m int, border bool) *Progress {
 	p := Progress{border: border}
 	p.gs = make([]*ui.Gauge, n)
 
@@ -45,6 +52,12 @@ func New(n int, border bool) *Progress {
 		}
 	}
 
+	if m > 0 {
+		p.mtext = ui.NewPar("")
+		p.mtext.Height = m
+		ui.Body.AddRows(ui.NewRow(ui.NewCol(12, 0, p.mtext)))
+	}
+
 	ui.Body.Align()
 	ui.Render(ui.Body)
 
@@ -75,4 +88,22 @@ func (p *Progress) Set(item int, label string, value int) {
 	}
 	p.gs[item].Percent = value
 	ui.Render(ui.Body)
+}
+
+func (p *Progress) AddMessage(m string) {
+	p.messages = append(p.messages, m)
+
+	if p.mtext != nil {
+		start := len(p.messages) - p.mtext.Height
+		if start < 0 {
+			start = 0
+		}
+
+		p.mtext.Text = strings.Join(p.messages[start:], "\n")
+		ui.Render(ui.Body)
+	}
+}
+
+func (p *Progress) Messages() []string {
+	return p.messages
 }

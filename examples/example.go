@@ -6,6 +6,7 @@ import (
         "flag"
 	"fmt"
 	"math/rand"
+        "strings"
 	"time"
 
 	ui "github.com/gizak/termui"
@@ -27,10 +28,14 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	defer ui.Close()
 
 	ui.Handle("q", func(ui.Event) {
 		ui.StopLoop()
+	})
+
+	ui.Handle("r", func(ui.Event) {
+		ui.Clear()
+		ui.Render(ui.Body)
 	})
 
 	ui.Handle("<Resize>", func(e ui.Event) {
@@ -41,12 +46,19 @@ func main() {
 		ui.Render(ui.Body)
 	})
 
-	p := progress.New(*tasks, *border)
+	p := progress.New(*tasks, 10, *border)
 	slots := slots.New(*tasks)
 
 	tpool := pool.New(*tasks)
 	tpool.Run()
-	defer tpool.Stop()
+
+        defer func() {
+            ui.Clear()
+	    ui.Close()
+	    tpool.Stop()
+
+            fmt.Println(strings.Join(p.Messages(), "\n"))
+        }()
 
 	go func() {
 		for c := 0; c < *total; c++ {
@@ -65,6 +77,7 @@ func main() {
 				}
 
 				p.Set(item, fmt.Sprintf("Task %v Done!", n), 100)
+                                p.AddMessage(fmt.Sprintf("Task %v Done!", n))
 
 				slots.Release(item)
 				return nil
