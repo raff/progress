@@ -3,24 +3,24 @@
 package main
 
 import (
-        "flag"
+	"flag"
 	"fmt"
 	"math/rand"
-        "strings"
+	"strings"
 	"time"
 
 	ui "github.com/gizak/termui"
-	"github.com/raff/slots"
 	"github.com/raff/progress"
+	"github.com/raff/slots"
 	"github.com/stefantalpalaru/pool"
 )
 
 func main() {
-        tasks := flag.Int("tasks", 10, "number of concurrent tasks")
-        total := flag.Int("total", 100, "number of total runs")
-        border := flag.Bool("border", true, "border/no border")
+	tasks := flag.Int("tasks", 10, "number of concurrent tasks")
+	total := flag.Int("total", 100, "number of total runs")
+	border := flag.Bool("border", true, "border/no border")
 
-        flag.Parse()
+	flag.Parse()
 
 	rand.Seed(time.Now().Unix())
 
@@ -46,19 +46,24 @@ func main() {
 		ui.Render(ui.Body)
 	})
 
-	p := progress.New(*tasks, 10, *border)
+	p := progress.New(*tasks, *border,
+		progress.Header(2),
+		progress.Messages(10))
+
+	p.SetHeader("Example application\nPress `q` to quit")
+
 	slots := slots.New(*tasks)
 
 	tpool := pool.New(*tasks)
 	tpool.Run()
 
-        defer func() {
-            ui.Clear()
-	    ui.Close()
-	    tpool.Stop()
+	defer func() {
+		ui.Clear()
+		ui.Close()
+		tpool.Stop()
 
-            fmt.Println(strings.Join(p.Messages(), "\n"))
-        }()
+		fmt.Println(strings.Join(p.Messages(), "\n"))
+	}()
 
 	go func() {
 		for c := 0; c < *total; c++ {
@@ -77,7 +82,7 @@ func main() {
 				}
 
 				p.Set(item, fmt.Sprintf("Task %v Done!", n), 100)
-                                p.AddMessage(fmt.Sprintf("Task %v Done!", n))
+				p.AddMessage(fmt.Sprintf("Task %v Done!", n))
 
 				slots.Release(item)
 				return nil
