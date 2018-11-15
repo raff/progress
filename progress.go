@@ -26,6 +26,7 @@ func Messages(m int) newOption {
 			m += 2
 		}
 		p.mtext = ui.NewPar("")
+		p.mtext.Border = p.border
 		p.mtext.Height = m
 	}
 }
@@ -37,6 +38,7 @@ func Header(h int) newOption {
 			h += 2
 		}
 		p.header = ui.NewPar("")
+		p.header.Border = p.border
 		p.header.Height = h
 	}
 }

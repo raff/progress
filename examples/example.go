@@ -29,7 +29,10 @@ func main() {
 		panic(err)
 	}
 
+        stopping := false
+
 	ui.Handle("q", func(ui.Event) {
+                stopping = true
 		ui.StopLoop()
 	})
 
@@ -74,6 +77,9 @@ func main() {
 				item := slots.Take()
 
 				for i := 0; i < z; i++ {
+                                        if stopping {
+                                                break
+                                        }
 					if i > 0 {
 						time.Sleep(time.Second)
 					}
