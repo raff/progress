@@ -72,6 +72,14 @@ func PercInt(curr, max int) int {
 	return curr * 100 / max
 }
 
+func PercInt64(curr, max int64) int {
+	if curr == 0 || max == 0 {
+		return 0
+	}
+
+	return int(curr * 100 / max)
+}
+
 func PercFloat(curr, max float64) int {
 	if curr == 0.0 || max == 0.0 {
 		return 0
