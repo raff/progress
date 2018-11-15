@@ -88,7 +88,7 @@ func main() {
 				}
 
 				p.Set(item, fmt.Sprintf("Task %v Done!", n), 100)
-				p.AddMessage(fmt.Sprintf("Task %v Done!", n))
+				p.AddMessagef("Task %v Done!", n)
 
 				slots.Release(item)
 				return nil

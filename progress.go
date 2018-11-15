@@ -1,8 +1,10 @@
 package progress
 
 import (
-	ui "github.com/gizak/termui"
+	"fmt"
 	"strings"
+
+	ui "github.com/gizak/termui"
 )
 
 type Progress struct {
@@ -128,6 +130,12 @@ func (p *Progress) SetHeader(m string) {
 	}
 }
 
+func (p *Progress) SetHeaderf(f string, v ...interface{}) {
+	if p.header != nil {
+		p.header.Text = fmt.Sprintf(f, v...)
+	}
+}
+
 func (p *Progress) Set(item int, label string, value int) {
 	if p.border {
 		p.gs[item].BorderLabel = label
@@ -136,6 +144,10 @@ func (p *Progress) Set(item int, label string, value int) {
 	}
 	p.gs[item].Percent = value
 	ui.Render(ui.Body)
+}
+
+func (p *Progress) AddMessagef(f string, v ...interface{}) {
+	p.AddMessage(fmt.Sprintf(f, v...))
 }
 
 func (p *Progress) AddMessage(m string) {
