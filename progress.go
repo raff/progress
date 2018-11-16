@@ -36,11 +36,14 @@ func Messages(m int) newOption {
 // Header specify that we want a "header" section with "h" lines
 func Header(h int) newOption {
 	return func(p *Progress) {
+		padding := 1
 		if p.border {
 			h += 2
+			padding = 0
 		}
 		p.header = ui.NewPar("")
 		p.header.Border = p.border
+		p.header.PaddingBottom = padding
 		p.header.Height = h
 	}
 }
