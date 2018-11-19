@@ -149,6 +149,16 @@ func (p *Progress) Set(item int, label string, value int) {
 	ui.Render(ui.Body)
 }
 
+func (p *Progress) SetColor(item int, c ui.Attribute) {
+	p.gs[item].BarColor = c
+	if p.border {
+		p.gs[item].BorderFg = c
+		p.gs[item].BorderLabelFg = c
+	} else {
+		p.ps[item].TextFgColor = c
+	}
+}
+
 func (p *Progress) AddMessagef(f string, v ...interface{}) {
 	p.AddMessage(fmt.Sprintf(f, v...))
 }
@@ -169,4 +179,8 @@ func (p *Progress) AddMessage(m string) {
 
 func (p *Progress) Messages() []string {
 	return p.messages
+}
+
+func Color(c string) ui.Attribute {
+	return ui.StringToAttribute(c)
 }
