@@ -3,6 +3,7 @@ package progress
 import (
 	"fmt"
 	"strings"
+        "sync"
 
 	ui "github.com/gizak/termui"
 )
@@ -17,6 +18,7 @@ type Progress struct {
 
 	mtext    *ui.Par  // a "messages" text box
 	messages []string // list of messages to return
+        sync.Mutex
 }
 
 type newOption func(p *Progress)
@@ -164,7 +166,9 @@ func (p *Progress) AddMessagef(f string, v ...interface{}) {
 }
 
 func (p *Progress) AddMessage(m string) {
+        p.Mutex.Lock()
 	p.messages = append(p.messages, m)
+        p.Mutex.Unlock()
 
 	if p.mtext != nil {
 		start := len(p.messages) - p.mtext.Height
@@ -172,7 +176,9 @@ func (p *Progress) AddMessage(m string) {
 			start = 0
 		}
 
+                p.Mutex.Lock()
 		p.mtext.Text = strings.Join(p.messages[start:], "\n")
+                p.Mutex.Unlock()
 		ui.Render(ui.Body)
 	}
 }
