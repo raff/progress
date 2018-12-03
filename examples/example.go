@@ -31,24 +31,6 @@ func main() {
 
         stopping := false
 
-	ui.Handle("q", func(ui.Event) {
-                stopping = true
-		ui.StopLoop()
-	})
-
-	ui.Handle("r", func(ui.Event) {
-		ui.Clear()
-		ui.Render(ui.Body)
-	})
-
-	ui.Handle("<Resize>", func(e ui.Event) {
-		payload := e.Payload.(ui.Resize)
-		ui.Body.Width = payload.Width
-		ui.Body.Align()
-		ui.Clear()
-		ui.Render(ui.Body)
-	})
-
 	p := progress.New(*tasks, *border,
 		progress.Header(2),
 		progress.Messages(10))
@@ -99,8 +81,22 @@ func main() {
 		fmt.Println(status.Submitted, "submitted jobs,", status.Running, "running,", status.Completed, "completed.")
 		fmt.Println()
 		tpool.Wait()
-		ui.StopLoop()
+		stopping = true
 	}()
 
-	ui.Loop()
+        uiEvents := ui.PollEvents()
+        for !stopping {
+                e := <-uiEvents
+		switch e.ID {
+		case "q", "<C-c>":
+                    stopping = true
+
+	        case "<Resize>":
+                    payload := e.Payload.(ui.Resize)
+                    ui.Body.Width = payload.Width
+                    ui.Body.Align()
+                    ui.Clear()
+                    ui.Render(ui.Body)
+                }
+        }
 }

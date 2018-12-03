@@ -3,7 +3,7 @@ package progress
 import (
 	"fmt"
 	"strings"
-        "sync"
+	"sync"
 
 	ui "github.com/gizak/termui"
 )
@@ -11,14 +11,14 @@ import (
 type Progress struct {
 	border bool // objects have borders
 
-	gs []*ui.Gauge // list of progress bars
-	ps []*ui.Par   // list of associated info
+	gs []*ui.Gauge     // list of progress bars
+	ps []*ui.Paragraph // list of associated info
 
-	header *ui.Par // a "header" text box
+	header *ui.Paragraph // a "header" text box
 
-	mtext    *ui.Par  // a "messages" text box
-	messages []string // list of messages to return
-        sync.Mutex
+	mtext    *ui.Paragraph // a "messages" text box
+	messages []string      // list of messages to return
+	sync.Mutex
 }
 
 type newOption func(p *Progress)
@@ -29,7 +29,7 @@ func Messages(m int) newOption {
 		if p.border {
 			m += 2
 		}
-		p.mtext = ui.NewPar("")
+		p.mtext = ui.NewParagraph("")
 		p.mtext.Border = p.border
 		p.mtext.Height = m
 	}
@@ -43,7 +43,7 @@ func Header(h int) newOption {
 			h += 2
 			padding = 0
 		}
-		p.header = ui.NewPar("")
+		p.header = ui.NewParagraph("")
 		p.header.Border = p.border
 		p.header.PaddingBottom = padding
 		p.header.Height = h
@@ -65,7 +65,7 @@ func New(n int, border bool, options ...newOption) *Progress {
 	if p.border {
 		height, padding = 3, 0
 	} else {
-		p.ps = make([]*ui.Par, n)
+		p.ps = make([]*ui.Paragraph, n)
 	}
 
 	if p.header != nil {
@@ -84,7 +84,7 @@ func New(n int, border bool, options ...newOption) *Progress {
 		if p.border {
 			ui.Body.AddRows(ui.NewRow(ui.NewCol(12, 0, p.gs[i])))
 		} else {
-			p.ps[i] = ui.NewPar("")
+			p.ps[i] = ui.NewParagraph("")
 			p.ps[i].Height = 1
 			p.ps[i].Border = false
 
@@ -166,9 +166,9 @@ func (p *Progress) AddMessagef(f string, v ...interface{}) {
 }
 
 func (p *Progress) AddMessage(m string) {
-        p.Mutex.Lock()
+	p.Mutex.Lock()
 	p.messages = append(p.messages, m)
-        p.Mutex.Unlock()
+	p.Mutex.Unlock()
 
 	if p.mtext != nil {
 		start := len(p.messages) - p.mtext.Height
@@ -176,9 +176,9 @@ func (p *Progress) AddMessage(m string) {
 			start = 0
 		}
 
-                p.Mutex.Lock()
+		p.Mutex.Lock()
 		p.mtext.Text = strings.Join(p.messages[start:], "\n")
-                p.Mutex.Unlock()
+		p.Mutex.Unlock()
 		ui.Render(ui.Body)
 	}
 }
