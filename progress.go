@@ -171,6 +171,11 @@ func (p *Progress) AddMessage(m string) {
 	p.Mutex.Unlock()
 
 	if p.mtext != nil {
+		h := p.mtext.Height
+		if p.border {
+			h -= 2
+		}
+
 		start := len(p.messages) - p.mtext.Height
 		if start < 0 {
 			start = 0
